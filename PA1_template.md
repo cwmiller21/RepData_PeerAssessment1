@@ -3,7 +3,8 @@
 
 
 ## Loading and preprocessing the data
-```{r data and preprocessing}
+
+```r
 # set options of scipen=6 so scientific notation is not used below.
 options(scipen=6)
 
@@ -18,9 +19,17 @@ act$date <- as.Date(act$date, "%Y-%m-%d")
 str(act)
 ```
 
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: num  0 5 10 15 20 25 30 35 40 45 ...
+```
+
 
 ## What is mean total number of steps taken per day?
-```{r calculate total steps ignoring NAs}
+
+```r
 # calculate sum of steps taken per day
 tot.steps <- aggregate(steps ~ date, sum, data=act)
 
@@ -32,7 +41,8 @@ median.tot.steps <- round(median(tot.steps$steps))
 Histogram of the total number of steps taken each day. 
 
 
-```{r histogram}
+
+```r
 library(ggplot2)
 qplot(tot.steps$steps, binwidth=500) +
     theme_bw() + 
@@ -40,11 +50,14 @@ qplot(tot.steps$steps, binwidth=500) +
     xlab("Total Number of Steps Each Day")
 ```
 
-The mean total number of steps taken per day was `r mean.tot.steps` and the 
-median was `r median.tot.steps`.
+![plot of chunk histogram](figure/histogram.png) 
+
+The mean total number of steps taken per day was 10766 and the 
+median was 10765.
 
 ## What is the average daily activity pattern?
-```{r average daily}
+
+```r
 # calculating the average daily activity per 5 minute interval
 #  ignoring NAs
 fivemin.steps <- aggregate(steps ~ interval, mean, data=act)
@@ -57,18 +70,23 @@ ggplot(data=fivemin.steps, aes(x=interval, y=steps)) +
     xlab("Interval") +
     ylab("Number of steps") +
     ggtitle("The Average Number of Steps Taken, Averaged Across All Days")
-    
+```
+
+![plot of chunk average daily](figure/average daily.png) 
+
+```r
 # calculate the interval with the maximum number of steps
 fivemin.steps.max <- subset(fivemin.steps, steps==max(fivemin.steps$steps))
 ```
 
-The 5-minute interval, `r fivemin.steps.max[1]`, contained the maximum number of
+The 5-minute interval, 835, contained the maximum number of
 steps averaged across all the days in the dataset ignoring NAs.
-The maximum was `r fivemin.steps.max[2]`.
+The maximum was 206.1698.
 
 ## Imputing missing values
 
-```{r impute missing values}
+
+```r
 # substitute missing values with the average for the 5 minute interval across days
 #  the floor function was used on the average for a 5 min interval 
 #  since steps should be an integer
@@ -89,7 +107,8 @@ median.tot.steps.noNA <- round(median(tot.steps$steps))
 Histogram of the total number of steps taken each day. 
 
 
-```{r histogram2}
+
+```r
 qplot(tot.steps$steps, binwidth=500) +
     theme_bw() + 
     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank()) +
@@ -97,10 +116,12 @@ qplot(tot.steps$steps, binwidth=500) +
     ggtitle("Imputed Dataset")
 ```
 
+![plot of chunk histogram2](figure/histogram2.png) 
+
 The mean total number of steps taken per day using the imputed dataset was 
-`r mean.tot.steps.noNA` and the median was `r median.tot.steps.noNA`.  For the 
-original data, the mean and median were `r mean.tot.steps` and 
-`r median.tot.steps` respectively.
+10750 and the median was 10641.  For the 
+original data, the mean and median were 10766 and 
+10765 respectively.
 
 **Effect of imputing data**  
 The mean and median for the imputed data are less than the values for the 
@@ -110,7 +131,8 @@ with zeroes.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r weekend}
+
+```r
 # use imputed data and create a weekend and weekday factor
 act.impNA$day <- weekdays(act.impNA$date)
 act.impNA$ww <- factor(ifelse(act.impNA$day=="Saturday"|
@@ -128,6 +150,7 @@ ggplot(data=fivemin.steps.ww, aes(x=interval, y=steps)) +
     xlab("Interval") +
     ylab("Number of steps") +
     ggtitle("Average Number of Steps for Interval")
-    
 ```
+
+![plot of chunk weekend](figure/weekend.png) 
 
